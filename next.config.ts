@@ -11,11 +11,8 @@ const nextConfig: NextConfig = {
       { protocol: "http",  hostname: "localhost", port: "8080" },
       { protocol: "http",  hostname: "localhost" },
     ],
-    localPatterns: [
-      { pathname: "/wp-content/**" },
-    ],
   },
-  // Proxy /wp-content/* → WordPress (ใช้สำหรับ images ใน local dev)
+  // Proxy /wp-content/* → WordPress
   async rewrites() {
     return [
       {

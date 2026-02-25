@@ -15,14 +15,14 @@ function wcAuth() {
 function normalizeImageUrl(url: string): string {
   if (!url) return '';
   let path = url;
-  // แทนที่ WP base URL ด้วย relative path
-  if (path.startsWith(WP_BASE)) {
+  // แทนที่ WP base URL ด้วย relative path (รองรับทั้ง local และ production)
+  path = path
+    .replace(/https?:\/\/localhost:8080/g, '')
+    .replace(/https?:\/\/api\.dji13store\.com/g, '')
+    .replace(/https?:\/\/www\.dji13store\.com/g, '');
+  // fallback: ถ้ายังเป็น absolute URL ของ WP_BASE ให้ strip ออก
+  if (WP_BASE && path.startsWith(WP_BASE)) {
     path = path.replace(WP_BASE, '');
-  } else {
-    // รองรับกรณี localhost:8080 ทั้ง http/https
-    path = path
-      .replace(/https?:\/\/localhost:8080/g, '')
-      .replace(/https?:\/\/www\.dji13store\.com/g, '');
   }
   // Strip query string — Next.js Image ไม่รองรับ query string ใน local paths
   const qIdx = path.indexOf('?');
@@ -290,5 +290,6 @@ export function normalizeContent(html: string): string {
   if (!html) return '';
   return html
     .replace(/https?:\/\/localhost:8080/g, '')
+    .replace(/https?:\/\/api\.dji13store\.com/g, '')
     .replace(/https?:\/\/www\.dji13store\.com/g, '');
 }
