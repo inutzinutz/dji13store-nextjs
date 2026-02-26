@@ -197,13 +197,14 @@ export async function getPage(slug: string) {
 
 // ---- Paginated fetch helpers (for sitemap & catch-all) ----
 
-/** Fetch ALL products (paginated, max 100/page) */
+/** Fetch ALL products (paginated, 20/page to stay under 2MB cache limit) */
 export async function getAllProducts(): Promise<WCProduct[]> {
   const all: WCProduct[] = [];
   let page = 1;
+  const PER_PAGE = 20;
   while (true) {
     const query = new URLSearchParams({
-      per_page: '100',
+      per_page: String(PER_PAGE),
       page: String(page),
       ...wcAuth(),
     });
@@ -215,7 +216,7 @@ export async function getAllProducts(): Promise<WCProduct[]> {
       const data: WCProduct[] = await res.json();
       if (data.length === 0) break;
       all.push(...data.map(normalizeProduct));
-      if (data.length < 100) break;
+      if (data.length < PER_PAGE) break;
       page++;
     } catch {
       break;
@@ -224,21 +225,22 @@ export async function getAllProducts(): Promise<WCProduct[]> {
   return all;
 }
 
-/** Fetch ALL posts (paginated, max 100/page) */
+/** Fetch ALL posts (paginated, 20/page to stay under 2MB cache limit) */
 export async function getAllPosts(): Promise<WPPost[]> {
   const all: WPPost[] = [];
   let page = 1;
+  const PER_PAGE = 20;
   while (true) {
     try {
       const res = await fetch(
-        `${WP_API}/wp/v2/posts?per_page=100&page=${page}&_embed`,
+        `${WP_API}/wp/v2/posts?per_page=${PER_PAGE}&page=${page}&_embed`,
         { next: { revalidate: 3600 } },
       );
       if (!res.ok) break;
       const data: WPPost[] = await res.json();
       if (data.length === 0) break;
       all.push(...data.map(normalizePost));
-      if (data.length < 100) break;
+      if (data.length < PER_PAGE) break;
       page++;
     } catch {
       break;
@@ -247,21 +249,22 @@ export async function getAllPosts(): Promise<WPPost[]> {
   return all;
 }
 
-/** Fetch ALL pages (paginated, max 100/page) */
+/** Fetch ALL pages (paginated, 20/page to stay under 2MB cache limit) */
 export async function getAllPages(): Promise<WPPost[]> {
   const all: WPPost[] = [];
   let page = 1;
+  const PER_PAGE = 20;
   while (true) {
     try {
       const res = await fetch(
-        `${WP_API}/wp/v2/pages?per_page=100&page=${page}&_embed`,
+        `${WP_API}/wp/v2/pages?per_page=${PER_PAGE}&page=${page}&_embed`,
         { next: { revalidate: 86400 } },
       );
       if (!res.ok) break;
       const data: WPPost[] = await res.json();
       if (data.length === 0) break;
       all.push(...data.map(normalizePost));
-      if (data.length < 100) break;
+      if (data.length < PER_PAGE) break;
       page++;
     } catch {
       break;

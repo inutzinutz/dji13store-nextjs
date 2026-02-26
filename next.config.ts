@@ -4,6 +4,9 @@ const WP_URL = process.env.WP_BASE_URL || "http://localhost:8080";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  turbopack: {
+    root: __dirname,
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "www.dji13store.com" },
